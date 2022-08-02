@@ -1,0 +1,166 @@
+<div id="root">
+  <div class="nav">
+    <ul id="nav"
+        style="margin: 0;padding: 0;position: fixed;top: 0;left:0;width: 100%;background-color: white;z-index: 99">
+      <li style="float: left">
+        <mat-icon (click)="filter()">menu</mat-icon>
+      </li>
+      <li id="hide-image-details" style="float:left;display:none">
+        <div style="margin:0;padding:0">
+          <button mat-button (click)="hideImageDetails()">Hide image details</button>
+        </div>
+      </li>
+      <li class="dropdown" style="float:right; margin-right: 7px">
+        <img class="dropbtn" src="../../assets/icon/unknown_user.jpg" width=26 alt="user">
+        <div class="dropdown-content">
+          <a href="/profile">Profile</a>
+<!--          <a href="/settings">Settings</a>-->
+          <a href="#" (click)="logout()">Log out</a>
+        </div>
+      </li>
+      <li style="float:right">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-upload"
+             width="24" height="24" viewBox="0 0 24 24" stroke="currentColor"
+             stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" (click)="photoUpload()">
+          <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+          <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2"></path>
+          <polyline points="7 9 12 4 17 9"></polyline>
+          <line x1="12" y1="4" x2="12" y2="16"></line>
+        </svg>
+      </li>
+      <li style="float:right">
+        <mat-icon (click)="listView()">list</mat-icon>
+      </li>
+    </ul>
+  </div>
+  <div id="body" style="width:100%;margin-top:7vh;">
+    <div id="filter-bar" style="background-color: #f8f8f8">
+      <form id="filter-form" [formGroup]="form" (ngSubmit)="onSubmit()">
+        <mat-radio-group aria-label="Select a search filter" formControlName="selector">
+          <mat-radio-button value="date">Date</mat-radio-button><br>
+          <mat-form-field class="filter" appearance="fill">
+            <mat-label>Enter a date range</mat-label>
+            <mat-date-range-input [rangePicker]="picker">
+              <input matStartDate formControlName="start" placeholder="Start date">
+              <input matEndDate formControlName="end" placeholder="End date">
+            </mat-date-range-input>
+            <mat-hint>MM/DD/YYYY – MM/DD/YYYY</mat-hint>
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-date-range-picker #picker></mat-date-range-picker>
+            <mat-error *ngIf="form.controls['start'].hasError('matStartDateInvalid')">Invalid start date</mat-error>
+            <mat-error *ngIf="form.controls['end'].hasError('matEndDateInvalid')">Invalid end date</mat-error>
+          </mat-form-field>
+          <br><br>
+
+          <mat-radio-button value="tags">Tags</mat-radio-button><br>
+          <mat-form-field class="filter" appearance="fill">
+            <mat-label>Search by tags</mat-label>
+            <mat-chip-list #chipList>
+              <mat-chip *ngFor="let tag of tags" (removed)="remove(tag)">
+                {{tag.name}}
+                <button matChipRemove>
+                  <mat-icon>cancel</mat-icon>
+                </button>
+              </mat-chip>
+              <input placeholder="Input a tag and press Enter"
+                     [matChipInputFor]="chipList"
+                     [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                     [matChipInputAddOnBlur]="addOnBlur"
+                     (matChipInputTokenEnd)="add($event)" style="width: 100%">
+            </mat-chip-list>
+          </mat-form-field>
+          <br><br>
+
+          <mat-radio-button value="notes">Notes</mat-radio-button><br>
+          <mat-form-field class="filter" appearance="fill">
+            <mat-label>Search by notes</mat-label>
+            <input matInput formControlName="notes">
+          </mat-form-field>
+          <br><br><br>
+        </mat-radio-group>
+
+        <ion-row>
+          <ion-col>
+            <ion-button className="ion-margin-top" type="submit" style="width: 50%">
+              Apply
+            </ion-button>
+          </ion-col>
+        </ion-row>
+      </form>
+    </div>
+    <div id="image-list" style="width: 75%;height:93vh;">
+      <!--65vh for show details and 93vh for hide details-->
+      <google-map id="my-map" height="100%"
+                  width="100%"
+                  [zoom]="zoom"
+                  [center]="center"
+                  [options]="options">
+        <map-marker
+          #markerElem="mapMarker"
+          *ngFor="let marker of markers"
+          [position]="marker.position"
+          [label]="marker.label"
+          [title]="marker.title"
+          [options]="marker.options"
+          (mapClick)="openInfo(markerElem, marker.info, marker.data)">
+        </map-marker>
+        <map-info-window>
+          <form [formGroup]="geoForm" (ngSubmit)="onGeoSubmit()">
+            <mat-form-field class="filter" appearance="fill" style="margin: 0;padding: 0;width:200px">
+              <mat-label>Search nearby</mat-label>
+              <input matInput formControlName="radius" placeholder="Radius">
+            </mat-form-field>
+            <br>
+            <mat-form-field appearance="fill" style="margin: 0 5px;padding: 0;width:80px">
+              <mat-label>Unit</mat-label>
+              <mat-select formControlName="radiusUnit">
+                <mat-option value="km">Km</mat-option>
+                <mat-option value="m">Meter</mat-option>
+                <mat-option value="mile">Mile</mat-option>
+              </mat-select>
+            </mat-form-field>
+            <ion-button type="submit" (click)="loadingfun()" style="padding: 0;margin-left:15px;margin-bottom: 15px">
+              Apply
+            </ion-button>
+          </form>
+        </map-info-window>
+      </google-map>
+    </div>
+    <div id="image-details" style="margin-left:25%;display:none">
+      <table style="text-align: center;width: 100%;margin-bottom: 5px">
+        <tbody id="image-details-tbody">
+        <tr>
+          <td rowspan="2" style="width: 120px;padding-left: 20px;padding-top: 30px">
+            <img class="photo"
+                 src="{{global.domain+'/'+singlePhoto.path}}" loading="lazy" width="120" height="150" alt="">
+          </td>
+          <td>ID: {{singlePhoto.id}}</td>
+          <td colspan="3">
+            Note:<br> {{singlePhoto.notes}}
+          </td>
+          <td>
+            <button class="photo-btn" mat-raised-button color="primary" (click)="editNote(singlePhoto.id, singlePhoto.notes, singlePhoto.tags)">
+              Edit note
+            </button>
+          </td>
+        </tr>
+        <tr>
+          <td>Date: {{singlePhoto.date}}</td>
+          <td>Result: {{singlePhoto.result}}</td>
+          <td>Uploaded by: {{singlePhoto.username}}</td>
+          <td>
+            Tags: {{singlePhoto.tags}}
+          </td>
+          <td>
+            <button class="photo-btn" mat-raised-button color="primary" (click)="editTags(singlePhoto.id, singlePhoto.tags, singlePhoto.notes)">
+              Edit
+              tags
+            </button>
+          </td>
+        </tr>
+        </tbody>
+
+      </table>
+    </div>
+  </div>
+</div>

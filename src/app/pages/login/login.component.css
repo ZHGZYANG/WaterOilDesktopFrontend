@@ -1,0 +1,41 @@
+#login {
+  width: 100vw;
+  height: 100vh;
+  background-image: url('src/assets/icon/water.png');
+  background-attachment: fixed;
+}
+
+mat-card {
+  max-width: 600px;
+  margin: 200px auto;
+  text-align: center;
+}
+
+h1 {
+  margin: 40px auto;
+}
+
+mat-form-field {
+  display: block;
+  margin: 30px auto;
+}
+
+a {
+  float: right;
+  /*padding-bottom: 20px;*/
+  /*margin-bottom: 20px;*/
+}
+
+#error{
+  font-size: 20px;
+}
+
+button{
+  width:150px;
+}
+
+.clearfix::after {
+  content: "";
+  clear: both;
+  display: table;
+}

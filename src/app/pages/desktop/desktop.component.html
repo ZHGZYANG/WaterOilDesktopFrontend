@@ -1,0 +1,135 @@
+<div id="root">
+  <div class="nav">
+    <ul id="nav"
+        style="margin: 0;padding: 0;position: fixed;top: 0;left:0;width: 100%;background-color: white;z-index: 99">
+      <li style="float: left">
+        <mat-icon (click)="filter()">menu</mat-icon>
+      </li>
+      <li style="float:left;">
+        <div style="margin:0;padding:0">
+          <button mat-button (click)="accordion?.openAll()">Expand All</button>
+          <button mat-button (click)="accordion?.closeAll()">Collapse All</button>
+        </div>
+      </li>
+      <li class="dropdown" style="float:right; margin-right: 7px">
+        <img class="dropbtn" src="../../assets/icon/unknown_user.jpg" width=26 alt="user">
+        <div class="dropdown-content">
+          <a href="/profile">Profile</a>
+<!--          <a href="/settings">Settings</a>-->
+          <a href="#" (click)="logout()">Log out</a>
+        </div>
+      </li>
+      <li style="float:right">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-upload"
+             width="24" height="24" viewBox="0 0 24 24" stroke="currentColor"
+             stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" (click)="photoUpload()">
+          <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+          <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2"></path>
+          <polyline points="7 9 12 4 17 9"></polyline>
+          <line x1="12" y1="4" x2="12" y2="16"></line>
+        </svg>
+      </li>
+      <li style="float:right">
+        <mat-icon (click)="mapView('global')">map</mat-icon>
+      </li>
+    </ul>
+  </div>
+  <div id="body" style="width:100%;margin-top:7vh;">
+    <div id="filter-bar" style="background-color: #f8f8f8">
+      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+        <mat-radio-group aria-label="Select a search filter" formControlName="selector">
+          <mat-radio-button value="date">Date</mat-radio-button><br>
+          <mat-form-field class="filter" appearance="fill">
+            <mat-label>Enter a date range</mat-label>
+            <mat-date-range-input [rangePicker]="picker">
+              <input matStartDate formControlName="start" placeholder="Start date">
+              <input matEndDate formControlName="end" placeholder="End date">
+            </mat-date-range-input>
+            <mat-hint>MM/DD/YYYY – MM/DD/YYYY</mat-hint>
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-date-range-picker #picker></mat-date-range-picker>
+            <mat-error *ngIf="form.controls['start'].hasError('matStartDateInvalid')">Invalid start date</mat-error>
+            <mat-error *ngIf="form.controls['end'].hasError('matEndDateInvalid')">Invalid end date</mat-error>
+          </mat-form-field>
+          <br><br>
+
+          <mat-radio-button value="tags">Tags</mat-radio-button><br>
+          <mat-form-field class="filter" appearance="fill">
+            <mat-label>Search by tags</mat-label>
+            <mat-chip-list #chipList>
+              <mat-chip *ngFor="let tag of tags" (removed)="remove(tag)">
+                {{tag.name}}
+                <button matChipRemove>
+                  <mat-icon>cancel</mat-icon>
+                </button>
+              </mat-chip>
+              <input placeholder="Input a tag and press Enter"
+                     [matChipInputFor]="chipList"
+                     [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                     [matChipInputAddOnBlur]="addOnBlur"
+                     (matChipInputTokenEnd)="add($event)" style="width: 100%">
+            </mat-chip-list>
+          </mat-form-field>
+          <br><br>
+
+          <mat-radio-button value="notes">Notes</mat-radio-button><br>
+          <mat-form-field class="filter" appearance="fill">
+            <mat-label>Search by notes</mat-label>
+            <input matInput formControlName="notes">
+          </mat-form-field>
+          <br><br><br>
+        </mat-radio-group>
+
+        <ion-row>
+          <ion-col>
+            <ion-button className="ion-margin-top" type="submit" style="width: 50%">
+              Apply
+            </ion-button>
+          </ion-col>
+        </ion-row>
+      </form>
+    </div>
+    <div id="image-list" style="width: 75%;height:93vh;" (scroll)="onScroll($event)">
+      <mat-accordion id="list" class="headers-align" multi>
+        <mat-expansion-panel [expanded]="true" *ngFor="let month of photoDateList">
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              {{transferDate(month)}}
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+          <div *ngFor="let photo of photoList">
+            <mat-card *ngIf="month == photo.date">
+              <img class="photo"
+                   src="{{global.domain+'/'+photo.path}}" loading="lazy" width="130" height="250" alt="">
+              <div style="text-align: left; width:100%;padding: 1px 20px">
+                <p class="photo-content">ID: <br>{{photo.id}}</p>
+                <p class="photo-content">GPS:<br> {{photo.gps}}</p>
+                <!--                <p class="photo-content">Date: <br>2022.02.02 12:00:00</p>-->
+                <p class="photo-content">Result: <br>{{photo.result}}</p>
+                <p class="photo-content">Uploaded by: <br>{{photo.username}}</p>
+                <p class="photo-content">Note: <br>{{photo.notes}}</p>
+                <p class="photo-content">Tags: <br>{{photo.tags}}</p>
+              </div>
+              <div>
+                <button class="photo-btn" mat-raised-button color="primary" (click)="mapView(photo)">View in
+                  map
+                </button>
+                <br>
+                <button class="photo-btn" mat-raised-button color="primary" (click)="editNote(photo.id,photo.notes, photo.tags)">
+                  Edit note
+                </button>
+                <button class="photo-btn" mat-raised-button color="primary" (click)="editTags(photo.id, photo.tags, photo.notes)">
+                  Edit
+                  tags
+                </button>
+              </div>
+            </mat-card>
+          </div>
+        </mat-expansion-panel>
+      </mat-accordion>
+      <div id="loading" style="display: none">
+        <mat-spinner></mat-spinner>
+      </div>
+    </div>
+  </div>
+</div>

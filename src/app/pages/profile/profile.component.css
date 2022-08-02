@@ -1,0 +1,46 @@
+#body {
+  width: 100vw;
+  height: 100vh;
+  background-image: url('src/assets/icon/water-low.png');
+  background-attachment: fixed;
+  text-align: center;
+}
+
+li{
+  display: inline;
+  padding: 2vh 16px;
+}
+
+li.dropdown {
+  display: inline-block;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #f9f9f9;
+  min-width: 160px;
+  transform: translateX(-83%);
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 100;
+}
+
+.dropdown-content a {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+  text-align: left;
+}
+
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
+h4{
+  padding: 20px;
+}
+
+button{
+  margin-top: 30px;
+}

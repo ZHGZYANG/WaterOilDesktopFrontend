@@ -1,0 +1,27 @@
+<div id="login">
+  <mat-card class="clearfix">
+    <mat-card-content>
+      <form [formGroup]="loginForm" #loginForma="ngForm" (ngSubmit)="onSubmit()">
+        <h1>Wateroil Management System</h1>
+        <mat-error id="error" *ngIf="!loginValid">
+          {{alert}}
+        </mat-error>
+        <mat-form-field>
+          <input matInput placeholder="Username" formControlName="username" name="username" required>
+          <mat-error>
+            Please input your username
+          </mat-error>
+        </mat-form-field>
+        <mat-form-field>
+          <input matInput type="password" placeholder="Password" formControlName="password" name="password" required>
+          <mat-error>
+            Please input your password
+          </mat-error>
+        </mat-form-field>
+        <button mat-raised-button color="primary" [disabled]="!loginForma.form.valid">Login</button>
+      </form>
+    </mat-card-content>
+    <a href="resetpassword">Change Password</a>
+    <div></div>
+  </mat-card>
+</div>

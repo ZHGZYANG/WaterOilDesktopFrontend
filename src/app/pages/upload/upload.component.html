@@ -1,0 +1,55 @@
+<div id="root">
+  <div class="nav">
+    <ul id="nav"
+        style="margin: 0;padding: 0;position: fixed;top: 0;left:0;width: 100%;background-color: white;z-index: 99">
+      <li class="dropdown" style="float:right; margin-right: 7px">
+        <img class="dropbtn" src="../../assets/icon/unknown_user.jpg" width=26 alt="user">
+        <div class="dropdown-content">
+          <a href="/profile">Profile</a>
+          <!--          <a href="/settings">Settings</a>-->
+          <a href="#" (click)="logout()">Log out</a>
+        </div>
+      </li>
+      <li style="float:right">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-upload"
+             width="24" height="24" viewBox="0 0 24 24" stroke="currentColor"
+             stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" (click)="photoUpload()">
+          <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+          <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2"></path>
+          <polyline points="7 9 12 4 17 9"></polyline>
+          <line x1="12" y1="4" x2="12" y2="16"></line>
+        </svg>
+      </li>
+      <li style="float:right">
+        <mat-icon (click)="listView()">list</mat-icon>
+      </li>
+    </ul>
+  </div>
+  <div id="body" style="width:100%;margin-top:10vh;">
+    <h1>Upload and analyze photo</h1>
+    <form [formGroup]="uploadForm">
+      <button type="button" mat-raised-button (click)="fileInput.click()">Choose File</button>
+      <input hidden (change)="onFileSelected($event)" #fileInput type="file" id="file" accept="image/*">
+      <h4>Photo selected: {{photoName}}</h4>
+      <br><br>
+
+      <mat-form-field class="" appearance="fill">
+        <mat-label>GPS location (Latitude first)</mat-label>
+        <input matInput placeholder="No space, separate by comma" value="" formControlName="gps">
+      </mat-form-field>
+      <br><br>
+
+      <mat-form-field class="" appearance="fill">
+        <mat-label>Note</mat-label>
+        <textarea matInput placeholder="Input your note" value="" formControlName="notes"></textarea>
+      </mat-form-field>
+      <br><br>
+
+    </form>
+    <button class="photo-btn" mat-raised-button color="primary" (click)="onSubmit()" [disabled]="progress > 0">Upload</button>
+    <div id="progress" class="progress form-group" *ngIf="progress > 0">
+      <div class="progress-bar progress-bar-striped bg-success" role="progressbar" [style.width.%]="progress">
+      </div>
+    </div>
+  </div>
+</div>
